@@ -16,13 +16,21 @@ object Producer {
         val topic = "screeners"
 
         try {
-            val record = new ProducerRecord[String, String](
-                topic,
-                "1",
-                "1,Alisa,Figgures"
-            )
-            producer.send(record)
-            println("Record sent...")
+            while(true) {
+                Utils.delay()
+
+                val key = Utils.getKey()
+                val value = Data.getScreeners()
+                
+                val record = new ProducerRecord[String, String](
+                    topic,
+                    key,
+                    value
+                )
+                producer.send(record)
+                println("New record sent...")
+            } // end while
+            
         } catch {
             case e: Exception => {
                 Utils.printLine()
@@ -31,9 +39,10 @@ object Producer {
             }
         } finally {
             producer.close()
-        }
+        } // end try catch
 
 
     } // end main
+
 } // end class
 

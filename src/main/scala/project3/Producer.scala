@@ -13,22 +13,19 @@ object Producer {
         props.put("acks", "all")
 
         val producer = new KafkaProducer[String, String](props)
-        val topic = "screeners"
 
         try {
             while(true) {
-                Utils.delay()
 
-                val key = Utils.getKey()
-                val value = Data.getScreeners()
+                Utils.delay()
+                Utils.printLine()
                 
-                val record = new ProducerRecord[String, String](
-                    topic,
-                    key,
-                    value
-                )
-                producer.send(record)
-                println("New record sent...")
+                sendRecord(producer, Data.screeners)
+
+                sendRecord(producer, Data.recruiters)
+
+                sendRecord(producer, Data.qualifiedLeads)
+
             } // end while
             
         } catch {
@@ -43,6 +40,21 @@ object Producer {
 
 
     } // end main
+
+
+    def sendRecord(producer: KafkaProducer[String, String], topic: String): Unit = {
+    
+        val key = Utils.getKey()
+        val value = Data.fetchData(topic)
+        
+        val record = new ProducerRecord[String, String](
+            topic,
+            key,
+            value
+        )
+        producer.send(record)
+        println("New record sent...")
+    } // end sendData
 
 } // end class
 

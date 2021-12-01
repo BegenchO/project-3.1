@@ -16,7 +16,7 @@ object Consumer {
         props.put("auto.commit.interval.ms", "1000")
         
         val consumer = new KafkaConsumer(props)
-        val topics = List("screeners")
+        val topics = List(Data.screeners, Data.recruiters, Data.qualifiedLeads)
 
         try {
             consumer.subscribe(topics.asJava)

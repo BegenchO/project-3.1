@@ -20,17 +20,17 @@ object Producer {
                 Utils.delay()
                 Utils.printLine()
 
-                sendRecord(producer, Data.screeners)
+                // sendRecord(producer, Data.screeners)
         
-                sendRecord(producer, Data.recruiters)
+                // sendRecord(producer, Data.recruiters)
 
                 sendRecord(producer, Data.qualifiedLeads)
 
-                sendRecord(producer, Data.contactAttempts)
+                // sendRecord(producer, Data.contactAttempts)
 
-                sendRecord(producer, Data.screenings)
+                // sendRecord(producer, Data.screenings)
 
-                sendRecord(producer, Data.offers)
+                // sendRecord(producer, Data.offers)
             
             } // end while
             

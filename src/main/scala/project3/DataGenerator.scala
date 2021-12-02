@@ -1,5 +1,12 @@
 package project3
 
+
+/**
+  * Data generator class
+  * Code from Theodore's P3 implementation
+  * Generates random data for each of 6 tables
+  * Methods are at the very bottom
+  */
 object DataGenerator {
 
   // Lists

@@ -28,11 +28,25 @@ object Data {
 
 
 
+    // List of topics
+    val topics = List(screeners, recruiters, qualifiedLeads, contactAttempts, screenings, offers)
+
+
+
+
     // Methods 
 
 
+
+    // Create data (credit to Theodore)
+    def fetchData(topic: String): String = {
+        DataGenerator.produce(topic)
+    } // end fetchData
+
+
+
     // Fetch data from Mockaroo API
-    def fetchData(dataType: String): String = {
+    def fetchDataAPI(dataType: String): String = {
         var result = ""
         try {
             var url = s"https://my.api.mockaroo.com/${dataType}?key=9e6718b0"
@@ -42,6 +56,9 @@ object Data {
         }
         result
                
-    } // end fetchData
+    } // end fetchDataAPI
+
+
+    
 
 } // end object

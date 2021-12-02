@@ -21,7 +21,7 @@ object Producer {
                 Utils.printLine()
 
                 sendRecord(producer, Data.screeners)
-                /*
+        
                 sendRecord(producer, Data.recruiters)
 
                 sendRecord(producer, Data.qualifiedLeads)
@@ -31,7 +31,7 @@ object Producer {
                 sendRecord(producer, Data.screenings)
 
                 sendRecord(producer, Data.offers)
-                */
+            
             } // end while
             
         } catch {

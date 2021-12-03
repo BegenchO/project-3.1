@@ -6,15 +6,15 @@ object Data {
 
     // id, first_name, last_name
     val screeners = "screeners"
-    val screenersFields = List("id","first_name", "last_name")
+    val screenersFields = List("screener_id","first_name", "last_name")
 
     // id, first_name, last_name
     val recruiters = "recruiters"
-    val recruitersFields = List("id","first_name", "last_name")
+    val recruitersFields = List("recruiter_id","first_name", "last_name")
 
     // id,first_name, last_name, university, major, email, home_state
     val qualifiedLeads = "qualifiedLeads"
-    val qualifiedLeadsFields = List("id","first_name", "last_name", "university", "major", "email", "home_state")
+    val qualifiedLeadsFields = List("ql_id","first_name", "last_name", "university", "major", "email", "home_state")
 
 
 

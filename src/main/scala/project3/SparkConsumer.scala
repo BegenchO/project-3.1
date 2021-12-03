@@ -21,13 +21,13 @@ object SparkConsumer {
         //totalNumOfQualifiedLeads(spark)
 
         // Perform ANALYSIS II
-
+        //screeningsPerScreener(spark)
 
         // Perform ANALYSIS III
-
+        contactAttemptsPerRecruiter(spark)
 
         // Perform ANALYSIS IV
-        offersByAction(spark)
+        //offersByAction(spark)
 
         spark.streams.awaitAnyTermination()
 
@@ -43,12 +43,11 @@ object SparkConsumer {
         
         val qualifiedLeadDF = getFormattedDF(spark, Data.qualifiedLeads)
 
-        // Print schema to console
         qualifiedLeadDF.printSchema()
 
-        // Print result to console
-        val qualifiedLeadCount = qualifiedLeadDF.select(count("id") as "total_qualified_leads")
-        qualifiedLeadCount.writeStream
+        // Total number of qualified leads
+        val totalQualifiedLeads = qualifiedLeadDF.select(count("id") as "total_qualified_leads")
+        totalQualifiedLeads.writeStream
             .outputMode("complete")
             .format("console")
             .start()
@@ -62,7 +61,24 @@ object SparkConsumer {
       * @param spark
       */ 
     def contactAttemptsPerRecruiter(spark: SparkSession): Unit = {
+        val recruitersDF = getFormattedDF(spark, Data.recruiters)
+        recruitersDF.printSchema()
 
+        val contactAttemptsDF = getFormattedDF(spark, Data.contactAttempts)
+        contactAttemptsDF.printSchema()
+
+        // Total number of contact attempts
+        val totalContactAttempts = contactAttemptsDF.select(count("ql_id") as "Total Contact Attemtps")
+
+        totalContactAttempts.writeStream
+            .outputMode("complete")
+            .format("console")
+            .start()
+
+        // Number of contact attempts per recruiter
+
+        // TO DO
+            
     }
 
     
@@ -72,7 +88,23 @@ object SparkConsumer {
       * @param spark
       */ 
     def screeningsPerScreener(spark: SparkSession): Unit = {
-        
+        val screenersDF = getFormattedDF(spark, Data.screeners)
+        screenersDF.printSchema()
+
+        val screeningsDF = getFormattedDF(spark, Data.screenings)
+        screeningsDF.printSchema()
+
+        // Total number of screenings
+        val totalScreenings = screeningsDF.select(count("ql_id") as "Total Screenings")
+
+        totalScreenings.writeStream
+            .outputMode("complete")
+            .format("console")
+            .start()
+
+        // Number of screenings per screener
+
+        // TO DO
     }
     
     /**
@@ -84,15 +116,15 @@ object SparkConsumer {
         val offersDF = getFormattedDF(spark, Data.offers)
         offersDF.printSchema()
 
-        // Total offer count
-        val totalOffer = offersDF.select(count("offer_action") as "total")
+        // Total number of offers
+        val totalOffer = offersDF.select(count("offer_action") as "Total Offers")
 
         totalOffer.writeStream
             .outputMode("complete")
             .format("console")
             .start()
 
-        // Total by offer action
+        // Number of offers by action type
         val offerByAction = offersDF.select("offer_action").groupBy("offer_action").count()
 
         offerByAction.writeStream

@@ -17,6 +17,11 @@ object DataGenerator {
   var createdRecruiterIds = new ListBuffer[String]()
   var createdQualifiedLeadIds = new ListBuffer[String]()
 
+  // Make sure contact attempts/screenings and offers are unique
+  var pastContactAttemptIds = new ListBuffer[String]()
+  var pastScreeningIds = new ListBuffer[String]()
+  var pastOfferIds = new ListBuffer[String]()
+
   def valueDeterminer(topic: String): String = {
 
     // Creates unique ids
@@ -79,11 +84,28 @@ object DataGenerator {
       existingId
     }
 
-    val existingQualifiedLeadId = {
+    def existingQualifiedLeadId(topic: String): String = {
       var existingId = "0"
-      if (createdQualifiedLeadIds.length > 0) {
-        val index = r.nextInt(createdQualifiedLeadIds.length)
-        existingId = createdQualifiedLeadIds(index)
+      var list: ListBuffer[String] = {
+        topic match {
+          case Data.contactAttempts => pastContactAttemptIds
+          case Data.screenings => pastScreeningIds
+          case Data.offers => pastOfferIds 
+          case _ => ListBuffer[String]()
+        }
+      }
+     
+      if (createdQualifiedLeadIds.length > 0 && createdQualifiedLeadIds.length != list.length) {
+        var exists = true
+
+        while(exists) {
+          val index = r.nextInt(createdQualifiedLeadIds.length)
+          existingId = createdQualifiedLeadIds(index)
+          if (!list.contains(existingId)) {
+            exists = false
+          }
+        }
+        
       }
       existingId
     }
@@ -147,39 +169,51 @@ object DataGenerator {
     }
 
     if(topic == Data.contactAttempts){
+      val existingQLId = existingQualifiedLeadId(Data.contactAttempts)
       value = (
       existingRecruiterId+","+
-      existingQualifiedLeadId+","+
+      existingQLId+","+
       date+","+
       start_time+","+
       end_time+","+
       contactMethod)
-    }
+      
+      // Add to avoid duplicate contactAttempts
+      pastContactAttemptIds += existingQLId
+    } // end if
 
 
     if(topic == Data.screenings){
+      val existingQLId = existingQualifiedLeadId(Data.screenings)
       value = (
       existingScreenerId+","+
-      existingQualifiedLeadId+","+
+      existingQLId+","+
       date+","+
       start_time+","+
       end_time+","+
       screenType+","+
       r.nextInt(10).toString+","+   // Number of questions
       r.nextInt(10).toString)       // Number of accepted 
-    }
+      
+      // Add to avoid duplicate screenings
+      pastScreeningIds += existingQLId
+    } // end if
 
 
     if(topic == Data.offers){
+      val existingQLId = existingQualifiedLeadId(Data.offers)
       value = (
       existingScreenerId+","+
       existingRecruiterId+","+
-      existingQualifiedLeadId+","+
+      existingQLId+","+
       date+","+
       offerActionDate+","+
       contactMethod+","+
       offerAction)
-    }
+
+      // Add to avoid duplicate offers
+      pastOfferIds += existingQLId
+    } // end if
 
     return value
   } // end valueDeterminer()

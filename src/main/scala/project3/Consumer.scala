@@ -22,6 +22,9 @@ object Consumer {
             while(true) {
                 val records = consumer.poll(10)
                 for (record <- records.asScala) {
+                    println("")
+                    Utils.printLine()
+                    println(s"Topic: ${record.topic()}")
                     Utils.printLine()
                     println(record.value())
                 }

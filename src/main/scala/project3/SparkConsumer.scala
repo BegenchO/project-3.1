@@ -20,7 +20,7 @@ object SparkConsumer {
         totalNumOfQualifiedLeads(spark)
 
         // Perform ANALYSIS II
-
+        
 
         // Perform ANALYSIS III
 
@@ -80,6 +80,12 @@ object SparkConsumer {
     
 
 
+    /**
+      * Returns DF with schema by subscribing to a Kafka topic
+      *
+      * @param spark
+      * @param topic
+      */
     def getFormattedDF(spark: SparkSession, topic: String): DataFrame = {
         import spark.implicits._
         val rawDF = spark.readStream
@@ -98,7 +104,7 @@ object SparkConsumer {
         // Create split statements
         val splitStatements = Utils.createSplitStatements(Data.qualifiedLeads)
         
-        // Convert string DF to csv DF
+        // Convert string DF to csv DF by splitting into columns
         val formattedDF = splitDF.selectExpr(splitStatements:_*)
 
         formattedDF

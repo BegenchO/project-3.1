@@ -2,7 +2,7 @@ package project3
 
 import scala.annotation.meta.field
 
-
+// CopyJarToVM              ->      scp -P 2222 project-3_2.11-0.1.0.jar maria_dev@sandbox-hdp.hortonworks.com:/home/maria_dev/project3
 // SparkConsumer.scala      ->      spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.4 --class project3.SparkConsumer project-3_2.11-0.1.0.jar
 // Consumer.scala           ->      spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.4 --class project3.Consumer project-3_2.11-0.1.0.jar
 // Producer.scala           ->      spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.4 --class project3.Producer project-3_2.11-0.1.0.jar

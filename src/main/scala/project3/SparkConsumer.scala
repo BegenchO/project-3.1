@@ -11,22 +11,23 @@ object SparkConsumer {
         val spark: SparkSession = SparkSession.builder
             .appName("Kafka Source")
             .config("spark.master", "local[*]")
+            .config("spark.streaming.concurrentJobs","2")
             .getOrCreate()
-
+        
         spark.sparkContext.setLogLevel("ERROR")
 
 
         // Perform ANALYSIS I
-        totalNumOfQualifiedLeads(spark)
+        //totalNumOfQualifiedLeads(spark)
 
         // Perform ANALYSIS II
-        
+
 
         // Perform ANALYSIS III
 
 
         // Perform ANALYSIS IV
-
+        offersByAction(spark)
 
         spark.streams.awaitAnyTermination()
 
@@ -70,14 +71,36 @@ object SparkConsumer {
       * Determine and display on the console the number of screenings and total number per screener 
       * @param spark
       */ 
-
+    def screeningsPerScreener(spark: SparkSession): Unit = {
+        
+    }
     
     /**
       * ANALYSIS IV
       * Determine and display on the console the number of offers and totals by offer action 
       * @param spark
       */ 
-    
+    def offersByAction(spark: SparkSession): Unit = {
+        val offersDF = getFormattedDF(spark, Data.offers)
+        offersDF.printSchema()
+
+        // Total offer count
+        val totalOffer = offersDF.select(count("offer_action") as "total")
+
+        totalOffer.writeStream
+            .outputMode("complete")
+            .format("console")
+            .start()
+
+        // Total by offer action
+        val offerByAction = offersDF.select("offer_action").groupBy("offer_action").count()
+
+        offerByAction.writeStream
+            .outputMode("complete")
+            .format("console")
+            .start()
+
+    } // end offersByAction
 
 
     /**
@@ -102,7 +125,7 @@ object SparkConsumer {
             .select("line")
         
         // Create split statements
-        val splitStatements = Utils.createSplitStatements(Data.qualifiedLeads)
+        val splitStatements = Utils.createSplitStatements(topic)
         
         // Convert string DF to csv DF by splitting into columns
         val formattedDF = splitDF.selectExpr(splitStatements:_*)

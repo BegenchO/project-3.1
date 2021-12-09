@@ -21,10 +21,10 @@ object SparkConsumer {
         //totalNumOfQualifiedLeads(spark)
 
         // Perform ANALYSIS II
-        //screeningsPerScreener(spark)
+        screeningsPerScreener(spark)
 
         // Perform ANALYSIS III
-        contactAttemptsPerRecruiter(spark)
+        //contactAttemptsPerRecruiter(spark)
 
         // Perform ANALYSIS IV
         //offersByAction(spark)
@@ -66,7 +66,7 @@ object SparkConsumer {
 
         val contactAttemptsDF = getFormattedDF(spark, Data.contactAttempts)
         contactAttemptsDF.printSchema()
-
+     
         // Total number of contact attempts
         val totalContactAttempts = contactAttemptsDF.select(count("ql_id") as "Total Contact Attemtps")
 
@@ -76,10 +76,30 @@ object SparkConsumer {
             .start()
 
         // Number of contact attempts per recruiter
+       
+        val contactPerRecruiter = contactAttemptsDF.select("recruiter_id").groupBy("recruiter_id").count().orderBy(desc("count"))
 
-        // TO DO
-            
-    }
+        contactPerRecruiter.writeStream
+            .outputMode("complete")
+            .format("console")
+            .start
+
+        /*
+        //Apply watermarks on event-time columns
+        val recruitersWithWatermark = recruitersDF.selectExpr("recruiter_id AS recruiterID", "timestamp AS recruiterTime").withWatermark("recruiterTime", "2 seconds")
+        val contactsWithWatermark = contactAttemptsDF.selectExpr("recruiter_id AS contactID", "timestamp AS contactTime").withWatermark("contactTime", "4 seconds")
+
+        // Join with event-time constraints
+        recruitersWithWatermark.join(
+        contactsWithWatermark,
+        expr("""
+            contactID = recruiterID AND
+            contactTime >= recruiterTime AND
+            contactTime <= recruiterTime + interval 10 seconds
+            """)
+        ).writeStream.outputMode("append").format("console").start()
+         */
+    } // end contact attempts
 
     
     /**
@@ -104,7 +124,12 @@ object SparkConsumer {
 
         // Number of screenings per screener
 
-        // TO DO
+        val screeningPerScreener = screeningsDF.select("screener_id").groupBy("screener_id").count().orderBy(desc("count"))
+
+        screeningPerScreener.writeStream
+            .outputMode("complete")
+            .format("console")
+            .start()
     }
     
     /**
@@ -141,23 +166,24 @@ object SparkConsumer {
       * @param spark
       * @param topic
       */
-    def getFormattedDF(spark: SparkSession, topic: String): DataFrame = {
+    def getFormattedDF(spark: SparkSession, topic: String, timestamp: Boolean = false): DataFrame = {
         import spark.implicits._
         val rawDF = spark.readStream
             .format("kafka")
             .option("kafka.bootstrap.servers", "sandbox-hdp.hortonworks.com:6667")
             .option("subscribe", topic)
             .load()
-            .select(col("value").cast("string"))
+            .select(col("value").cast("string"), col("timestamp"))
 
+        
         // Split String into separate lines
         val splitLines = udf { s: String => s.split('\n') }
         val splitDF = rawDF
             .withColumn("line", explode(splitLines($"value")))
-            .select("line")
+            .select("timestamp", "line")
         
         // Create split statements
-        val splitStatements = Utils.createSplitStatements(topic)
+        val splitStatements = Utils.createSplitStatements(topic, timestamp)
         
         // Convert string DF to csv DF by splitting into columns
         val formattedDF = splitDF.selectExpr(splitStatements:_*)

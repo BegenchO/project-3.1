@@ -28,9 +28,15 @@ object Utils {
         key
     }
 
-    def createSplitStatements(topic: String): Array[String] = {
+    def createSplitStatements(topic: String, timestamp: Boolean): Array[String] = {
         var fields = List[String]()
-        var stringStatements = ""
+        var stringStatements = {
+            if (timestamp) {
+                "timestamp~"
+            } else {
+                ""
+            }
+        }
 
         // Get list of field names based on topic
         topic match {
